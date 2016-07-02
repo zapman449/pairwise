@@ -35,6 +35,13 @@ def test_validatepairs2():
     assert pairwise.validate_pairs(pairs, historical_pairs) is True
 
 
+def test_validatepairs3():
+    pairs = None
+    historical_pairs = []
+    historical_pairs.append(set(['aaa', 'ccc']))
+    assert pairwise.validate_pairs(pairs, historical_pairs) is False
+
+
 def test_relevanthistory1():
     metahistory = {
         "2016-07-01 16:25:54.376811": [['aaa', 'bbb'], ['ccc', 'ddd']],
@@ -46,3 +53,27 @@ def test_relevanthistory1():
     result = pairwise.prune_history(metahistory, 2)
     assert len(result) == 4
     assert len(result[1]) == 3
+
+
+def test_parsecli1():
+    test_args = ["--relevant-history", "2"]
+    args = pairwise.parse_cli(test_args=test_args)
+    assert args.relevant_history == "2"
+
+
+def test_parsecli2():
+    test_args = ["--history", "foo-bar"]
+    args = pairwise.parse_cli(test_args=test_args)
+    assert args.history == "foo-bar"
+
+
+def test_parsecli3():
+    test_args = ["--names", "foo-bar"]
+    args = pairwise.parse_cli(test_args=test_args)
+    assert args.names == "foo-bar"
+
+
+def test_parsecli4():
+    test_args = ["--coworkers", "foo-bar"]
+    args = pairwise.parse_cli(test_args=test_args)
+    assert args.coworkers == "foo-bar"
