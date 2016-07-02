@@ -9,6 +9,7 @@ import itertools
 import json
 import os.path
 import random
+import sys
 
 HISTORY = "./pairwise_history.json"
 # pairwise_history.json is a dictionary with keys of ISO8601 timestamps
@@ -23,7 +24,7 @@ RELEVANT_HISTORY = 8
 # matches are not repeated.  Set to zero (0) to ignore
 
 
-def parse_cli():
+def parse_cli(test_args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--history", default=HISTORY,
                         help="File for pair history")
@@ -34,7 +35,10 @@ def parse_cli():
     parser.add_argument("--relevant-history", default=RELEVANT_HISTORY,
                         help="Number of past pairings to consider when "
                              "validating pairs")
-    args = parser.parse_args()
+    if test_args is None:
+        args = parser.parse_args()
+    else:
+        args = parser.parse_args(test_args)
     return args
 
 
@@ -92,8 +96,16 @@ def validate_pairs(pairs, historical_pairs):
 def load_names(args):
     """Loads the names from JSON"""
     # NAMES is a json document which is just a list of names
-    with open(args.names, 'r') as n:
-        names = json.load(n)
+    if os.path.isfile(args.names):
+        with open(args.names, 'r') as n:
+            try:
+                names = json.load(n)
+            except:
+                sys.exit("ERROR: {0} is invalid JSON".format(args.names))
+    else:
+        sys.exit("ERROR {0} file not found.".format(args.names))
+    if len(names) <= 1:
+        sys.exit("ERROR: {0} needs to have more than 1 name in it".format(args.names))
     return names
 
 
