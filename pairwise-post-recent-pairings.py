@@ -28,9 +28,20 @@ def slack_login():
     global CREDS
     with open(CREDS, 'r') as f:
         jdict = json.load(f)
-    slack_api_token = jdict['slack_api_token']
+    try:
+        slack_api_token = jdict['slack_api_token']
+    except KeyError:
+        sys.exit("ERROR: {0} must specify a key 'slack_api_token'".format(CREDS))
     slack = slacker.Slacker(slack_api_token)
-    return slack, jdict['user'], jdict['channel']
+    try:
+        user = jdict['user']
+    except:
+        sys.exit("ERROR: {0} must specify a key 'user' for your slack username".format(CREDS))
+    try:
+        channel = jdict['channel']
+    except:
+        sys.exit("ERROR: {0} must specify a key 'channel' for the channel to post all pairings".format(CREDS))
+    return slack, user, channel
 
 
 def get_most_recent_pairs(args):
