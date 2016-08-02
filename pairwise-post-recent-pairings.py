@@ -42,13 +42,16 @@ def get_most_recent_pairs(args):
 
 
 def send_message_pairings(pair, args):
+    "Formats messages and sends as DMs to the appropriate users"
+    dm_template_two = "Hey @{0}! you've been paired with @{1} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{2}"
+    dm_template_three = "Hey @{0}! you've been paired with @{1} and @{2} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
     if len(pair) == 2:
-        message0 = "Hey @{0}! you've been paired with @{1} in #chatroulette.  Please setup a meeting when you can.".format(pair[0], pair[1])
-        message1 = "Hey @{0}! you've been paired with @{1} in #chatroulette.  Please setup a meeting when you can.".format(pair[1], pair[0])
+        message0 = dm_template_two.format(pair[0], pair[1], args.user)
+        message1 = dm_template_two.format(pair[1], pair[0], args.user)
     elif len(pair) == 3:
-        message0 = "Hey @{0}! you've been paired with @{1} and @{2} in #chatroulette.  Please setup a meeting when you can.".format(pair[0], pair[1], pair[2])
-        message1 = "Hey @{0}! you've been paired with @{1} and @{2} in #chatroulette.  Please setup a meeting when you can.".format(pair[1], pair[0], pair[2])
-        message2 = "Hey @{0}! you've been paired with @{1} and @{2} in #chatroulette.  Please setup a meeting when you can.".format(pair[2], pair[0], pair[1])
+        message0 = dm_template_three.format(pair[0], pair[1], pair[2], args.user)
+        message1 = dm_template_three.format(pair[1], pair[0], pair[2], args.user)
+        message2 = dm_template_three.format(pair[2], pair[0], pair[1], args.user)
     if args.dry_run is True:
         print("This message would be sent to {0}:".format(pair[0]))
         print(message0)
@@ -62,7 +65,7 @@ def send_message_pairings(pair, args):
         args.slack.chat.post_message("@" + pair[0], message0, username=args.user)
         args.slack.chat.post_message("@" + pair[1], message1, username=args.user)
         if len(pair) == 3:
-            args.slack.chat.post_message("@" + pair[2], message2)
+            args.slack.chat.post_message("@" + pair[2], message2, username=args.user)
 
 
 def send_all_pairings(pairs, args):
