@@ -50,3 +50,24 @@ optional arguments:
                         Number of past pairings to consider when validating
                         pairs
 ```
+
+### pairwise-add-member.py
+```
+$ ./pairwise-add-member.py <member>
+```
+
+Adds member to the list of names
+
+### pairwise-remove-member.py
+```
+pairwise-remove-member.py <member>
+```
+
+Removes member from the list of names
+
+### pairwise-post-recent-pairings.py
+```
+pairwise-post-recent-pairings.py [-d]
+```
+
+Posts the most recent pairings to slack.  A DM to each user with their partner, and one message to the CHANNEL specified in slack_creds.json with all pairings.
