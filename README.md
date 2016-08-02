@@ -18,6 +18,12 @@ JSON list of lists.  Each set of coworkers is a list.
 JSON Dictionary.  The key is the date/time stamp of each pair set building.
 The values are lists of pair lists.
 
+### slack_creds.json
+JSON Dictionary.  The following three keys and values need to be set:
+1. 'slack_api_token'.  Value is your slack_api_token
+2. 'user'.  The value is your username in the slack
+3. 'channel'.  The value is the name of the channel where the 'all pairings' message would go
+
 ## Usage:
 
 ```
