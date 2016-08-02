@@ -85,8 +85,6 @@ def main():
     args = parse_cli()
     args.slack, args.user, args.channel = slack_login()
     pairs = get_most_recent_pairs(args)
-    # testing override
-    pairs = [["jimkogs", "michaelhoney", "royrapoport"]]
     for pair in pairs:
         send_message_pairings(pair, args)
     send_all_pairings(pairs, args)
