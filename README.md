@@ -24,6 +24,22 @@ JSON Dictionary.  The following three keys and values need to be set:
 2. 'user'.  The value is your username in the slack
 3. 'channel'.  The value is the name of the channel where the 'all pairings' message would go
 
+And the following two keys are optional:
+1. 'dm_template_two': python template string for the DMs for pairings of two people.  Needs to specify {0}, {1}, and {2} for recipient, partner, and source user (aka you)
+
+   * example:
+       ```
+       "dm_template_two": "Hey @{0}! you've been paired with @{1} in #face-to-face.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{2}",
+       ```
+
+2. 'dm_template_three': python template string for the DMs for pairings of three people.  Needs to specify {0}, {1}, {2} and {3} for recipient, partner1, partner2, and source user (aka you)
+
+   * example:
+       ```
+       "dm_template_three": "Hey @{0}! you've been paired with @{1} and @{2} in #face-to-face.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
+       ```
+
+
 ## Usage:
 
 ```

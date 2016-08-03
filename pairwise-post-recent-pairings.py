@@ -24,7 +24,7 @@ def parse_cli(test_args=None):
     return args
 
 
-def slack_login():
+def get_slack_details(args):
     global CREDS
     with open(CREDS, 'r') as f:
         jdict = json.load(f)
@@ -32,16 +32,23 @@ def slack_login():
         slack_api_token = jdict['slack_api_token']
     except KeyError:
         sys.exit("ERROR: {0} must specify a key 'slack_api_token'".format(CREDS))
-    slack = slacker.Slacker(slack_api_token)
+    args.slack = slacker.Slacker(slack_api_token)
     try:
-        user = jdict['user']
+        args.user = jdict['user']
     except:
         sys.exit("ERROR: {0} must specify a key 'user' for your slack username".format(CREDS))
     try:
-        channel = jdict['channel']
+        args.channel = jdict['channel']
     except:
         sys.exit("ERROR: {0} must specify a key 'channel' for the channel to post all pairings".format(CREDS))
-    return slack, user, channel
+    try:
+        args.dm_template_two = jdict['dm_template_two']
+    except KeyError:
+        args.dm_template_two = "Hey @{0}! you've been paired with @{1} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{2}"
+    try:
+        args.dm_template_three = jdict['dm_template_three']
+    except KeyError:
+        args.dm_template_three = "Hey @{0}! you've been paired with @{1} and @{2} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
 
 
 def get_most_recent_pairs(args):
@@ -55,15 +62,13 @@ def get_most_recent_pairs(args):
 def make_messages(pair, args):
     messages = {}
     # key will be recipient, value will be message
-    dm_template_two = "Hey @{0}! you've been paired with @{1} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{2}"
-    dm_template_three = "Hey @{0}! you've been paired with @{1} and @{2} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
     if len(pair) == 2:
-        messages[pair[0]] = dm_template_two.format(pair[0], pair[1], args.user)
-        messages[pair[1]] = dm_template_two.format(pair[1], pair[0], args.user)
+        messages[pair[0]] = args.dm_template_two.format(pair[0], pair[1], args.user)
+        messages[pair[1]] = args.dm_template_two.format(pair[1], pair[0], args.user)
     elif len(pair) == 3:
-        messages[pair[0]] = dm_template_three.format(pair[0], pair[1], pair[2], args.user)
-        messages[pair[1]] = dm_template_three.format(pair[1], pair[0], pair[2], args.user)
-        messages[pair[2]] = dm_template_three.format(pair[2], pair[0], pair[1], args.user)
+        messages[pair[0]] = args.dm_template_three.format(pair[0], pair[1], pair[2], args.user)
+        messages[pair[1]] = args.dm_template_three.format(pair[1], pair[0], pair[2], args.user)
+        messages[pair[2]] = args.dm_template_three.format(pair[2], pair[0], pair[1], args.user)
     return messages
 
 
@@ -98,7 +103,7 @@ def send_all_pairings(pairs, args):
 
 def main():
     args = parse_cli()
-    args.slack, args.user, args.channel = slack_login()
+    get_slack_details(args)
     pairs = get_most_recent_pairs(args)
     for pair in pairs:
         send_message_pairings(pair, args)
