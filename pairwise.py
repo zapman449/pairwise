@@ -175,7 +175,12 @@ def print_pairs(pairs):
     for pair in pairs:
         counter += 1
         p = sorted(list(pair))
-        print("Pair {0:02d}: {1} and {2}".format(counter, p[0], p[1]))
+        if len(pair) == 2:
+            print("Pair {0:02d}: {1} and {2}".format(counter, p[0], p[1]))
+        elif len(pair) == 3:
+            print("Pair {0:02d}: {1}, {2} and {3}".format(counter, p[0], p[1], p[2]))
+        else:
+            print("A serious error happened.  A pair should be either 2 or 3 people, not {}.".format(len(pair)))
 
 
 def main():
