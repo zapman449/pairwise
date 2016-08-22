@@ -33,6 +33,7 @@ def parse_cli(test_args=None):
     parser.add_argument("--names", default=NAMES,
                         help="File for the list participant names")
     parser.add_argument("--relevant-history", default=RELEVANT_HISTORY,
+                        dest='relevant_history',
                         help="Number of past pairings to consider when "
                              "validating pairs")
     if test_args is None:
@@ -109,16 +110,14 @@ def load_names(args):
     return names
 
 
-def prune_history(metahistory, relevant=None):
+def prune_history(metahistory, relevant_history):
     """
     Prunes the historical pairs, and returns a list of sets of relevant
-    pairs based on RELEVANT_HISTORY or the passed in relevant value
+    pairs based on relevant_history
     """
-    if relevant is None:
-        relevant = RELEVANT_HISTORY
     historical_pairs = []
     # Show only the relevant keys:
-    relevant_dates = sorted(metahistory.keys())[0 - relevant:]
+    relevant_dates = sorted(metahistory.keys())[0 - relevant_history:]
     for date in relevant_dates:
         for p in metahistory[date]:
             historical_pairs.append(set(p))
@@ -136,7 +135,7 @@ def load_history(args):
             metahistory = json.load(h)
     else:
         metahistory = {}
-    return prune_history(metahistory)
+    return prune_history(metahistory, args.relevant_history)
 
 
 def load_coworkers(args):
