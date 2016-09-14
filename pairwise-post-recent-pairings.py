@@ -44,11 +44,11 @@ def get_slack_details(args):
     try:
         args.dm_template_two = jdict['dm_template_two']
     except KeyError:
-        args.dm_template_two = "Hey @{0}! you've been paired with @{1} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{2}"
+        args.dm_template_two = "Hey @{0}! you've been paired with @{1} in #face-to-face.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{2}"
     try:
         args.dm_template_three = jdict['dm_template_three']
     except KeyError:
-        args.dm_template_three = "Hey @{0}! you've been paired with @{1} and @{2} in #chatroulette.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
+        args.dm_template_three = "Hey @{0}! you've been paired with @{1} and @{2} in #face-to-face.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
 
 
 def get_most_recent_pairs(args):

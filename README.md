@@ -1,6 +1,6 @@
 # Pairwise
 
-Designed for Rands' Slack channel #chatroulette.  Builds the pairs, and
+Designed for Rands' Slack channel #face-to-face.  Builds the pairs, and
 checks the history to see if any pairs have been seen before (inside the
 relevant-history value).  
 
@@ -9,7 +9,7 @@ won't be matched together.
 
 ## Document formats:
 ### pairwise_names.json
-JSON list of all participants in chat roulette
+JSON list of all participants in face-to-face conversations
 
 ### pairwise_coworkers.json
 JSON list of lists.  Each set of coworkers is a list.
