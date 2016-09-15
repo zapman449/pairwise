@@ -188,10 +188,19 @@ def main():
     historical_pairs = load_history(args)
     historical_pairs.extend(load_coworkers(args))
     pairs = None
+    validation_checks = 0
+    validation_succeeded = True
     while validate_pairs(pairs, historical_pairs) is False:
         pairs = make_pairs(names)
-    print_pairs(pairs)
-    update_history(pairs, args)
+        validation_checks += 1
+        if validation_checks > len(list(itertools.combinations(names,2))):
+            validation_succeeded = False
+            break
+    if validation_succeeded:
+        print_pairs(pairs)
+        update_history(pairs, args)
+    else:
+        print("ERROR: validating pairs failed. There may be something wrong with the availability possible matches.")
 
 if __name__ == "__main__":
     main()
