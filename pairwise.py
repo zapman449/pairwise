@@ -193,7 +193,7 @@ def main():
     while validate_pairs(pairs, historical_pairs) is False:
         pairs = make_pairs(names)
         validation_checks += 1
-        if validation_checks > len(list(itertools.combinations(names,2))):
+        if validation_checks > len(list(itertools.combinations(names, 2))):
             validation_succeeded = False
             break
     if validation_succeeded:
