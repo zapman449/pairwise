@@ -49,6 +49,10 @@ def get_slack_details(args):
         args.dm_template_three = jdict['dm_template_three']
     except KeyError:
         args.dm_template_three = "Hey @{0}! you've been paired with @{1} and @{2} in #face-to-face.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
+    if args.user.startswith("@"):
+        sys.exit("ERROR: user value in slack_creds file can not start with an @ sign")
+    if args.channel.startswith("#"):
+        sys.exit("ERROR: channel value in slack_creds file can not start with an # sign")
 
 
 def get_most_recent_pairs(args):
