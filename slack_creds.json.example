@@ -1,0 +1,7 @@
+{
+  "slack_api_token": "........",
+  "user": "jason",
+  "channel": "zmeta-test",
+  "dm_template_two": "Hey @{0}! you've been paired with @{1} in #face-to-face.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{2}",
+  "dm_template_three": "Hey @{0}! you've been paired with @{1} and @{2} in #face-to-face.  Please setup a meeting when you can.  If you have any questions, concerns or issues, please contact @{3}"
+}
