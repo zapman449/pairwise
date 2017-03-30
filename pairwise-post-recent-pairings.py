@@ -84,7 +84,10 @@ def send_message_pairings(pair, args):
             print("This message would be sent to {0}".format(recipient))
             print(messages[recipient])
         else:
-            args.slack.chat.post_message("@" + recipient, messages[recipient], username=args.user)
+            try:
+                args.slack.chat.post_message("@" + recipient, messages[recipient], username=args.user)
+            except Exception:
+                print("could not pair: " + recipient + ", " + messages[recipient] + ", " + args.user)
     if args.dry_run is True:
         print()
 
