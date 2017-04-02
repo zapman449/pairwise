@@ -36,6 +36,9 @@ def parse_cli(test_args=None):
                         dest='relevant_history',
                         help="Number of past pairings to consider when "
                              "validating pairs")
+    parser.add_argument("-d", "--dry-run", dest="dry_run", action='store_true',
+                        help="dry run everything")
+                                                     
     if test_args is None:
         args = parser.parse_args()
     else:
@@ -198,7 +201,9 @@ def main():
             break
     if validation_succeeded:
         print_pairs(pairs)
-        update_history(pairs, args)
+        
+        if args.dry_run is False:
+            update_history(pairs, args)
     else:
         print("ERROR: validating pairs failed. There may be something wrong with the availability possible matches.")
 
