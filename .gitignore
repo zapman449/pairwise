@@ -1,3 +1,4 @@
 *.json
 .coverage
 *.pyc
+pairwise_names.json.bak

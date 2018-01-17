@@ -11,6 +11,9 @@ import os.path
 import random
 import sys
 
+import slacker
+
+CREDS = "./slack_creds.json"
 HISTORY = "./pairwise_history.json"
 # pairwise_history.json is a dictionary with keys of ISO8601 timestamps
 # and value of a list of pair_lists
@@ -23,6 +26,23 @@ RELEVANT_HISTORY = 8
 # RELEVANT_HISTORY controls how much recent history is used for ensuring
 # matches are not repeated.  Set to zero (0) to ignore
 
+def get_slack_details(args):
+    global CREDS
+    with open(CREDS, 'r') as f:
+        jdict = json.load(f)
+    try:
+        slack_api_token = jdict['slack_api_token']
+    except KeyError:
+        sys.exit("ERROR: {0} must specify a key 'slack_api_token'".format(CREDS))
+    args.slack = slacker.Slacker(slack_api_token)
+    try:
+        args.user = jdict['user']
+    except:
+        sys.exit("ERROR: {0} must specify a key 'user' for your slack username".format(CREDS))
+    try:
+        args.channel = jdict['channel']
+    except:
+        sys.exit("ERROR: {0} must specify a key 'channel' for the channel to post all pairings".format(CREDS))
 
 def parse_cli(test_args=None):
     parser = argparse.ArgumentParser()
@@ -38,7 +58,7 @@ def parse_cli(test_args=None):
                              "validating pairs")
     parser.add_argument("-d", "--dry-run", dest="dry_run", action='store_true',
                         help="dry run everything")
-                                                     
+    
     if test_args is None:
         args = parser.parse_args()
     else:
@@ -97,20 +117,26 @@ def validate_pairs(pairs, historical_pairs):
     return True
 
 
-def load_names(args):
-    """Loads the names from JSON"""
-    # NAMES is a json document which is just a list of names
-    if os.path.isfile(args.names):
-        with open(args.names, 'r') as n:
-            try:
-                names = json.load(n)
-            except:
-                sys.exit("ERROR: {0} is invalid JSON".format(args.names))
-    else:
-        sys.exit("ERROR {0} file not found.".format(args.names))
-    if len(names) <= 1:
-        sys.exit("ERROR: {0} needs to have more than 1 name in it".format(args.names))
-    return names
+def get_names(args):
+    """Loads the names from the configured slack channel"""
+
+    channels_list = args.slack.channels.list().body['channels']
+    channel_name_ids = {
+        c['name']: c['id']
+        for c in channels_list
+    }
+
+    users_list = args.slack.users.list().body['members']
+    user_id_name = {
+        u['id']: u['profile']['display_name'] or u['name']
+        for u in users_list if not u['deleted']
+    }
+
+    channel_info = args.slack.channels.info(channel_name_ids[args.channel]).body['channel']
+    return [
+        user_id_name[m]
+        for m in channel_info['members'] if user_id_name.get(m)
+    ]
 
 
 def prune_history(metahistory, relevant_history):
@@ -182,12 +208,13 @@ def print_pairs(pairs):
         elif len(pair) == 3:
             print("Pair {0:02d}: {1}, {2} and {3}".format(counter, p[0], p[1], p[2]))
         else:
-            print("A serious error happened.  A pair should be either 2 or 3 people, not {}.".format(len(pair)))
+            print("A serious error happened.  A pair should be either 2 or 3 people, not {}. Pair: {}".format(len(pair), pair))
 
 
 def main():
     args = parse_cli()
-    names = load_names(args)
+    get_slack_details(args)
+    names = get_names(args)
     historical_pairs = load_history(args)
     historical_pairs.extend(load_coworkers(args))
     pairs = None
@@ -201,7 +228,7 @@ def main():
             break
     if validation_succeeded:
         print_pairs(pairs)
-        
+
         if args.dry_run is False:
             update_history(pairs, args)
     else:
