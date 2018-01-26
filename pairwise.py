@@ -22,6 +22,9 @@ COWORKERS = "./pairwise_coworkers.json"
 # put them in the same list.  All pairwise combinations will be created.
 NAMES = "./pairwise_names.json"
 # pairwise_names.json is a list of all the names in the rota
+IGNORE_NAMES = "./pairwise_ignore.json"
+# pairwise_ignore.json is the list of people to not pair with anyone.
+# usecase is for people signed up, but gone silent.
 RELEVANT_HISTORY = 8
 # RELEVANT_HISTORY controls how much recent history is used for ensuring
 # matches are not repeated.  Set to zero (0) to ignore
@@ -52,13 +55,14 @@ def parse_cli(test_args=None):
                         help="File for lists of coworkers")
     parser.add_argument("--names", default=NAMES,
                         help="File for the list participant names")
+    parser.add_argument("--ignore-names", default=IGNORE_NAMES,
+                        help="File for the list of names to ignore")
     parser.add_argument("--relevant-history", default=RELEVANT_HISTORY,
                         dest='relevant_history',
                         help="Number of past pairings to consider when "
                              "validating pairs")
     parser.add_argument("-d", "--dry-run", dest="dry_run", action='store_true',
                         help="dry run everything")
-    
     if test_args is None:
         args = parser.parse_args()
     else:
@@ -183,6 +187,23 @@ def load_coworkers(args):
     return coworkers
 
 
+def unload_ignored(args, names):
+    if os.path.isfile(args.ignore_names):
+        with open(args.ignore_names, 'r') as i:
+            try:
+                ignore_names = json.load(i)
+            except:
+                sys.exit("ERROR: {0} is invalid JSON".format(args.ignore_names))
+    else:
+        print("WARNING: {0} file does not exist.  Assuming empty")
+        return None
+    for igname in ignore_names:
+        try:
+            names.remove(igname)
+        except ValueError:
+            pass
+
+
 def update_history(pairs, args):
     if os.path.isfile(args.history):
         with open(args.history, 'r') as h:
@@ -215,6 +236,7 @@ def main():
     args = parse_cli()
     get_slack_details(args)
     names = get_names(args)
+    unload_ignored(args, names)
     historical_pairs = load_history(args)
     historical_pairs.extend(load_coworkers(args))
     pairs = None
@@ -228,7 +250,6 @@ def main():
             break
     if validation_succeeded:
         print_pairs(pairs)
-
         if args.dry_run is False:
             update_history(pairs, args)
     else:
